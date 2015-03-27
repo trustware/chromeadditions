@@ -29,7 +29,6 @@ if sys.platform == "win32":
 
 # Helper function that sends a message to the webapp.
 def send_message(message):
-  #message = f.read()
   # Write message size.
   sys.stdout.write(struct.pack('I', len(message)))
   # Write the message itself.
@@ -73,8 +72,12 @@ if Tkinter:
       self.text.config(state=Tkinter.DISABLED, height=10, width=40)
 
       self.messageContent = Tkinter.StringVar()
-      self.sendEntry = Tkinter.Entry(self, textvariable=self.messageContent)
+      self.sendEntry = Tkinter.Entry(self, text="token:", textvariable=self.messageContent)
       self.sendEntry.grid(row=1, column=0, padx=10, pady=10)
+
+      self.urlContent = Tkinter.StringVar()
+      self.urlEntry = Tkinter.Entry(self, text="url:", textvariable=self.urlContent)
+      self.urlEntry.grid(row=2, column=0, padx=10, pady=10)
 
       self.sendButton = Tkinter.Button(self, text="Send", command=self.onSend)
       self.sendButton.grid(row=1, column=1, padx=10, pady=10)
@@ -88,30 +91,51 @@ if Tkinter:
           self.quit()
           return
         self.log("Received %s" % message)
+        self.onSend(message, message)
 
       self.after(100, self.processMessages)
 
-    def onSend(self):
+    def onSend(self, _token=-1, _url=""):
 
       #change to Kyle's location
       location = '/dev/otp'
+      location = '/Users/zanesalem/otp' # TODO: comment out
+
+      uid = 489123498746
+      otp = 0
+
+      if _token != -1:
+        token = _token 
+      else:
+        token = self.messageContent.get()
+
+      if _url != "":
+        url = _url
+      else:
+        url = self.urlContent.get()
+
+
       try:
         f = open(location, 'r')
+        _otp = f.read()
       except:
         tkMessageBox.showinfo('Native Messaging Example',
-                              'No one time password file found: '+location)
-        sys.exit(1)
+                              'problem reading'+location)
+        #sys.exit(1)
 
-      data = {'id': 1234567890 ,'otp': f.read(), 'token': '', 'url': ''}
+      data = {'uid': uid ,'otp': otp, 'token': token, 'url': url}
       self.log('Sending %s' % data)
 
       try:
-        send_message(data)
+        send_message(json.dumps(data))
 
         url = "http://eecs588-auth.herokuapp.com/"
 
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         r = requests.post(url, data=json.dumps(data), headers=headers)
+        
+        self.log('Request: %s' % r)
+
 
       except IOError:
         tkMessageBox.showinfo('Native Messaging Example',
@@ -134,7 +158,7 @@ def Main():
   queue = Queue.Queue()
 
   main_window = NativeMessagingWindow(queue)
-  main_window.master.title('Native Messaging Example')
+  main_window.master.title('Device Info to Chrome Extension')
 
   thread = threading.Thread(target=read_thread_func, args=(queue,))
   thread.daemon = True
