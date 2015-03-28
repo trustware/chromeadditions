@@ -91,7 +91,11 @@ if Tkinter:
           self.quit()
           return
         self.log("Received %s" % message)
-        self.onSend(message, message)
+
+        json_acceptable_string = message.replace("'", "\"")
+        d = json.loads(json_acceptable_string)
+
+        self.onSend(d['token'], d['url'])
 
       self.after(100, self.processMessages)
 
@@ -99,9 +103,8 @@ if Tkinter:
 
       #change to Kyle's location
       location = '/dev/otp'
-      location = '/Users/zanesalem/otp' # TODO: comment out
 
-      uid = 489123498746
+      uid = 0 #default values
       otp = 0
 
       if _token != -1:
@@ -117,7 +120,7 @@ if Tkinter:
 
       try:
         f = open(location, 'r')
-        _otp = f.read()
+        otp = f.read()
       except:
         tkMessageBox.showinfo('Native Messaging Example',
                               'problem reading'+location)
@@ -129,7 +132,7 @@ if Tkinter:
       try:
         send_message(json.dumps(data))
 
-        url = "http://eecs588-auth.herokuapp.com/"
+        url = "http://eecs588-auth.herokuapp.com/" #mock manufacture service
 
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         r = requests.post(url, data=json.dumps(data), headers=headers)

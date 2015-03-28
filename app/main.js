@@ -12,6 +12,12 @@ var getKeys = function(obj){
    return keys;
 }
 
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
 
 function appendMessage(text) {
   document.getElementById('response').innerHTML += "<p>" + text + "</p>";
@@ -30,7 +36,8 @@ function updateUiState() {
 }
 
 function sendNativeMessage() {
-  message = {"text": document.getElementById('input-text').value};
+  message = {"token": getParameterByName("token"),
+             "url": getParameterByName("token");
   port.postMessage(message);
   appendMessage("Sent message: <b>" + JSON.stringify(message) + "</b>");
 }
@@ -57,7 +64,11 @@ function connect() {
 document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('connect-button').addEventListener(
       'click', connect);
+
   document.getElementById('send-message-button').addEventListener(
       'click', sendNativeMessage);
+
+  connect();
+  sendNativeMessage();
   updateUiState();
 });
