@@ -14,6 +14,9 @@ import Queue
 import json
 import requests
 
+import urllib
+import urllib2
+
 try:
   import Tkinter
   import tkMessageBox
@@ -122,28 +125,22 @@ if Tkinter:
         f = open(location, 'r')
         otp = f.read()
       except:
-        tkMessageBox.showinfo('Native Messaging Example',
-                              'problem reading'+location)
+        tkMessageBox.showinfo('Native Messaging Example', 'problem reading'+location)
         #sys.exit(1)
 
-      data = {'uid': uid ,'otp': otp, 'token': token, 'url': url}
+      data = urllib.urlencode({'uid': uid ,'otp': otp, 'token': token, 'url': url})
       self.log('Sending %s' % data)
 
       try:
-        send_message(json.dumps(data))
-
         url = "http://eecs588-auth.herokuapp.com/authenticate" #mock manufacture service
+        #r = requests.post(url, data=json.dumps(data), headers=headers)
+        r = urllib2.Request(url, data)
+        response = urllib2.urlopen(r)
 
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        r = requests.post(url, data=json.dumps(data), headers=headers)
-        
-        self.log('Request: %s' % r)
-
-
-      except IOError:
-        tkMessageBox.showinfo('Native Messaging Example',
-                              'Failed to send message.')
-        sys.exit(1)
+      except IOError as e:
+        print e
+        tkMessageBox.showinfo('Native Messaging Example', 'Failed to send message.')
+        #sys.exit(1)
 
     def log(self, message):
       self.text.config(state=Tkinter.NORMAL)
