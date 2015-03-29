@@ -12,10 +12,14 @@ import threading
 import Queue
 
 import json
-import requests
 
 import urllib
 import urllib2
+
+try:
+  import lightblue
+except ImportError:
+  lightblue = None
 
 try:
   import Tkinter
@@ -85,6 +89,9 @@ if Tkinter:
       self.sendButton = Tkinter.Button(self, text="Send", command=self.onSend)
       self.sendButton.grid(row=1, column=1, padx=10, pady=10)
 
+      self.sendButton = Tkinter.Button(self, text="Bluetooth", command=self.getBluetooth)
+      self.sendButton.grid(row=2, column=1, padx=10, pady=10)
+
       self.after(100, self.processMessages)
 
     def processMessages(self):
@@ -101,6 +108,15 @@ if Tkinter:
         self.onSend(d['token'], d['url'])
 
       self.after(100, self.processMessages)
+
+    def getBluetooth(self):
+
+      nearby_devices = lightblue.discover_devices(lookup_names = True)
+
+      print "found %d devices" % len(nearby_devices)
+
+      for name, addr in nearby_devices:
+           print " %s - %s" % (addr, name)
 
     def onSend(self, _token=-1, _url=""):
 
