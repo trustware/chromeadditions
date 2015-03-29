@@ -20,7 +20,7 @@ function onDisconnected() {
 }
 
 function connect() {
-  var hostName = "com.google.chrome.example.echo";
+  var hostName = "com.trustware.deviceinfo";
   console.log("Connecting to native messaging host " + hostName)
   port = chrome.runtime.connectNative(hostName);
   port.onMessage.addListener(onNativeMessage);

@@ -19,6 +19,6 @@ else
   fi
 fi
 
-HOST_NAME=com.google.chrome.example.echo
-rm "$TARGET_DIR/com.google.chrome.example.echo.json"
+HOST_NAME=com.trustware.deviceinfo
+rm "$TARGET_DIR/com.trustware.deviceinfo.json"
 echo "Native messaging host $HOST_NAME has been uninstalled."
