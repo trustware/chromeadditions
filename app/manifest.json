@@ -1,14 +1,18 @@
 {
   // Extension ID: knldjmfmopnpolahpmmgbagdohdnhkik
   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDcBHwzDvyBQ6bDppkIs9MP4ksKqCMyXQ/A52JivHZKh4YO/9vJsT3oaYhSpDCE9RPocOEQvwsHsFReW2nUEc6OLLyoCFFxIb7KkLGsmfakkut/fFdNJYh0xOTbSN8YvLWcqph09XAY2Y/f0AL7vfO1cuCqtkMt8hFrBGWxDdf9CQIDAQAB",
-  "name": "Device Info Retrieval",
-  "version": "1.0",
+  "name": "Trustware: Web to Device",
+  "version": "1.1",
   "manifest_version": 2,
-  "description": "Communicate with native application that acquires device info",
-  "app": {
-    "launch": {
-      "local_path": "main.html"
+  "description": "Allow websites to communicate with our native application that acquires device info",
+  "content_scripts": [
+    {
+      "matches": ["http://*/*","https://*/*","<all_urls>"],
+      "js": ["webpage_handler.js"]
     }
+  ],
+  "background": {
+    "scripts": ["nativehost_handler.js"]
   },
   "icons": {
     "128": "icon-128.png"

@@ -104,7 +104,7 @@ if Tkinter:
       #change to Kyle's location
       location = '/dev/otp'
 
-      uid = 0 #default values
+      uid = 100 #default values
       otp = 0
 
       if _token != -1:
@@ -132,7 +132,7 @@ if Tkinter:
       try:
         send_message(json.dumps(data))
 
-        url = "http://eecs588-auth.herokuapp.com/" #mock manufacture service
+        url = "http://eecs588-auth.herokuapp.com/authenticate" #mock manufacture service
 
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         r = requests.post(url, data=json.dumps(data), headers=headers)
@@ -161,7 +161,7 @@ def Main():
   queue = Queue.Queue()
 
   main_window = NativeMessagingWindow(queue)
-  main_window.master.title('Device Info to Chrome Extension')
+  main_window.master.title('Device Info to Manufacturer')
 
   thread = threading.Thread(target=read_thread_func, args=(queue,))
   thread.daemon = True
