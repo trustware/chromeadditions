@@ -1,9 +1,15 @@
-if(document.getElementById("trustwareButton")){
+if(document.getElementById("trustwareInfo")){
 	console.log("Trustware Detected!")
 
-	document.getElementById("trustwareForm").addEventListener("submit", function(){
-	    var msg = {"token": document.getElementById('trustwareToken').value,
-	               "url": document.getElementById('trustwareUrl').value}
+	node = document.getElementById("trustwareInfo");
+	while (node.nodeName != "FORM" && node.parentNode) {
+    	node = node.parentNode;
+	}
+
+	node.addEventListener("submit", function(){
+	    var msg = {"token": document.getElementById('trustwareInfo').value,
+	               "url": document.getElementById('trustwareInfo').getAttribute('url')}
+		console.log(msg);
 
 	    chrome.extension.sendRequest({method: "sendmsg", data:msg});
 	});
