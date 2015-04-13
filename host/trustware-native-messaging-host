@@ -111,7 +111,8 @@ if Tkinter:
         # send surrounding devices
         devicelist = self.getBluetooth()
         for device in devicelist:
-          self.onSend(json_message['token'], json_message['url'], device['uid'], device['otp'])
+          self.log("Bluetooth device: %s" % device[0])
+          self.onSend(json_message['token'], json_message['url'], device[0], device[1])
 
       self.after(100, self.processMessages)
 
