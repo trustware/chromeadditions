@@ -115,7 +115,7 @@ if Tkinter:
 
       self.after(100, self.processMessages)
 
-    def shellCmdToFile(command, duration, nameOut, nameErr):
+    def shellCmdToFile(self, command, duration, nameOut, nameErr):
       # Run shell command with output piped to file
       fileOut = open(nameOut, 'w')
       fileErr = open(nameErr, 'w')
