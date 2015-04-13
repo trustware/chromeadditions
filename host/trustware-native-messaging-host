@@ -121,12 +121,13 @@ if Tkinter:
       #shellCmdToFile('hcitool lescan', 0.5, '.scanOutput', '.scanErr')
 
       # Read output and remove temp files
-      with open('.scanOutput', 'r') as fileOut:
-        linesOut = fileOut.readlines()
-      with open('.scanErr', 'r') as fileErr:
-        linesErr = fileErr.readlines()
-      os.remove('.scanOutput')
-      os.remove('.scanErr')
+      #with open('.scanOutput', 'r') as fileOut:
+      #  linesOut = fileOut.readlines()
+      #with open('.scanErr', 'r') as fileErr:
+      
+      #  linesErr = fileErr.readlines()
+      #os.remove('.scanOutput')
+      #os.remove('.scanErr')
 
       # Try to catch common problems
       if len(linesErr) > 0:
