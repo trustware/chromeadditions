@@ -115,21 +115,35 @@ if Tkinter:
 
       self.after(100, self.processMessages)
 
+    def shellCmdToFile(command, duration, nameOut, nameErr):
+      # Run shell command with output piped to file
+      fileOut = open(nameOut, 'w')
+      fileErr = open(nameErr, 'w')
+      process = subprocess.Popen(command.split(), stdout=fileOut, stderr=fileErr)
+
+      # Terminate process after x seconds and wait a moment to write output files
+      time.sleep(duration)
+      try:
+        process.send_signal(signal.SIGINT)
+      except OSError as e:
+        pass
+      time.sleep(0.5)
+      fileOut.close()
+      fileErr.close()
+
     def getBluetooth(self):
       # Run Bluetooth LE scan tool and write output to file
       print 'Scanning BTLE...'
-      #shellCmdToFile('hcitool lescan', 0.5, '.scanOutput', '.scanErr')
+      shellCmdToFile('hcitool lescan', 0.5, '.scanOutput', '.scanErr')
 
       # Read output and remove temp files
-      #with open('.scanOutput', 'r') as fileOut:
-      #  linesOut = fileOut.readlines()
-      #with open('.scanErr', 'r') as fileErr:
-      
-      #  linesErr = fileErr.readlines()
-      #os.remove('.scanOutput')
-      #os.remove('.scanErr')
+      with open('.scanOutput', 'r') as fileOut:
+        linesOut = fileOut.readlines()
+      with open('.scanErr', 'r') as fileErr:
+        linesErr = fileErr.readlines()
+      os.remove('.scanOutput')
+      os.remove('.scanErr')
 
-      linesErr = "omg"
 
       # Try to catch common problems
       if len(linesErr) > 0:
