@@ -16,10 +16,10 @@ import json
 import urllib
 import urllib2
 
-try:
-  import lightblue
-except ImportError:
-  lightblue = None
+import os
+import signal
+import subprocess
+import time
 
 try:
   import Tkinter
