@@ -14,7 +14,7 @@ def main():
     linesOut = fileOut.readlines()
   with open('.scanErr', 'r') as fileErr:
     linesErr = fileErr.readlines()
-  os.remove('.scanOutput')
+  #os.remove('.scanOutput')
   os.remove('.scanErr')
 
   # Try to catch common problems
