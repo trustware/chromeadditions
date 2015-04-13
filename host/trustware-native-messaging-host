@@ -129,7 +129,7 @@ if Tkinter:
       #os.remove('.scanOutput')
       #os.remove('.scanErr')
 
-      linesErr = 0
+      linesErr = "omg"
 
       # Try to catch common problems
       if len(linesErr) > 0:
