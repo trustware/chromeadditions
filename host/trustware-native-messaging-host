@@ -149,12 +149,17 @@ if Tkinter:
       # Try to catch common problems
       if len(linesErr) > 0:
         if linesErr[0] == 'Set scan parameters failed: Operation not permitted\n':
+          self.log('BTLE scanning failed; did you run this script as root?')
           print 'BTLE scanning failed; did you run this script as root?'
           return
         if linesErr[0] == 'Set scan parameters failed: Input/output error\n':
+          self.log('BTLE scanning failed; trying restarting the local hardware device')
+
           print 'BTLE scanning failed; trying restarting the local hardware device'
           return
         if len(linesOut) == 0:
+          self.log('BTLE scanning failed; unknown')
+
           print 'BTLE scanning failed for an unknown reason. Error log:'
           for line in linesErr:
             print line
