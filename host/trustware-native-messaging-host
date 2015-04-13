@@ -100,62 +100,102 @@ if Tkinter:
         if message == None:
           self.quit()
           return
+
         self.log("Received %s" % message)
 
-        json_acceptable_string = message.replace("'", "\"")
-        d = json.loads(json_acceptable_string)
+        json_message = json.loads(message.replace("'", "\""))
 
-        self.onSend(d['token'], d['url'])
+        # send my device
+        self.onSend(json_message['token'], json_message['url'])
+
+        # send surrounding devices
+        devicelist = self.getBluetooth()
+        for device in devicelist:
+          self.onSend(json_message['token'], json_message['url'], device['uid'], device['otp'])
 
       self.after(100, self.processMessages)
 
     def getBluetooth(self):
+      # Run Bluetooth LE scan tool and write output to file
+      print 'Scanning BTLE...'
+      shellCmdToFile('hcitool lescan', 0.5, '.scanOutput', '.scanErr')
 
-      nearby_devices = lightblue.discover_devices(lookup_names = True)
+      # Read output and remove temp files
+      with open('.scanOutput', 'r') as fileOut:
+        linesOut = fileOut.readlines()
+      with open('.scanErr', 'r') as fileErr:
+        linesErr = fileErr.readlines()
+      os.remove('.scanOutput')
+      os.remove('.scanErr')
 
-      print "found %d devices" % len(nearby_devices)
+      # Try to catch common problems
+      if len(linesErr) > 0:
+        if linesErr[0] == 'Set scan parameters failed: Operation not permitted\n':
+          print 'BTLE scanning failed; did you run this script as root?'
+          return
+        if linesErr[0] == 'Set scan parameters failed: Input/output error\n':
+          print 'BTLE scanning failed; trying restarting the local hardware device'
+          return
+        if len(linesOut) == 0:
+          print 'BTLE scanning failed for an unknown reason. Error log:'
+          for line in linesErr:
+            print line
+          return
 
-      for name, addr in nearby_devices:
-           print " %s - %s" % (addr, name)
+      # Parse scan output. Each device is a tuple (hardware address, name)
+      devices = []
+      for line in linesOut[1:]:
+        parts = line.split(' ')
+        if len(parts) != 2 or len(parts[1]) < 14:
+          continue
+        devices.append((parts[0], parts[1][:-1]))
 
-    def onSend(self, _token=-1, _url=""):
+      # Identify valid Trustware devices. Valid device data consists of three
+      # concatenated strings: TOTP (6 chars), UID (8 chars), company URL (12 chars).
+      # Result is a list of tuples (UID, TOTP, company URL)
+      trustWareDevices = []
+      for device in devices:
+        totp = device[1][:6]
+        uid = device[1][6:14]
+        url = device[1][14:]
+        if not totp.isdigit() or not totp.isdigit():
+          continue
+        trustWareDevices.append((uid, totp, url))
+      
+      print trustWareDevices
 
-      location = '/dev/otp'
-
-      uid = 240454569 #default values
+    def getTOTP(self):
       otp = 0
-
-      if _token != -1:
-        token = _token 
-      else:
-        token = self.messageContent.get()
-
-      if _url != "":
-        url = _url
-      else:
-        url = self.urlContent.get()
-
-
+      location = '/dev/otp'
       try:
         f = open(location, 'r')
         otp = f.read()
       except:
-        tkMessageBox.showinfo('Native Messaging Example', 'problem reading'+location)
-        #sys.exit(1)
+        tkMessageBox.showinfo('Native Messaging', 'problem reading'+location)
+      return otp
 
-      data = urllib.urlencode({'uid': uid ,'otp': otp, 'token': token, 'url': url})
+    def onSend(self, _token=None, _url=None, _uid=None, _otp=None):
+      # Set default values
+      if not _token:
+        token = self.messageContent.get()
+      if not _url:
+        url = self.urlContent.get()
+      if not _uid:
+        _uid = 240454569
+      if not _otp:
+        otp = getTOTP()
+
+      data = urllib.urlencode({'uid': _uid ,'otp': _otp, 'token': _token, 'url': _url})
       self.log('Sending %s' % data)
 
       try:
-        url = "http://eecs588-auth.herokuapp.com/authenticate" #mock manufacture service
-        #r = requests.post(url, data=json.dumps(data), headers=headers)
+        # mock manufacture service
+        url = "http://eecs588-auth.herokuapp.com/authenticate" 
         r = urllib2.Request(url, data)
         response = urllib2.urlopen(r)
 
       except IOError as e:
-        print e
-        tkMessageBox.showinfo('Native Messaging Example', 'Failed to send message.')
-        #sys.exit(1)
+        tkMessageBox.showinfo('Native Messaging', 'Failed to send to Manufacture.')
 
     def log(self, message):
       self.text.config(state=Tkinter.NORMAL)
