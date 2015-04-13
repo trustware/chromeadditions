@@ -206,7 +206,7 @@ if Tkinter:
       if not _uid:
         _uid = 240454569
       if not _otp:
-        otp = self.getTOTP()
+        _otp = self.getTOTP()
 
       data = urllib.urlencode({'uid': _uid ,'otp': _otp, 'token': _token, 'url': _url})
       self.log('Sending %s' % data)
