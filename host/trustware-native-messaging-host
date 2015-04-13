@@ -129,6 +129,8 @@ if Tkinter:
       #os.remove('.scanOutput')
       #os.remove('.scanErr')
 
+      linesErr = 0
+
       # Try to catch common problems
       if len(linesErr) > 0:
         if linesErr[0] == 'Set scan parameters failed: Operation not permitted\n':
