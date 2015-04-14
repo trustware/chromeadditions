@@ -25,6 +25,10 @@ HOST_NAME=com.trustware.deviceinfo
 # Create directory to store native messaging host.
 mkdir -p "$TARGET_DIR"
 
+# Get bluetooth le dependency and lower permissions (Linux)
+sudo apt-get install libcap2-bin
+sudo setcap 'cap_net_raw,cap_net_admin+eip' `which hcitool`
+
 # Copy native messaging host manifest.
 cp "$DIR/$HOST_NAME.json" "$TARGET_DIR"
 
