@@ -89,7 +89,7 @@ if Tkinter:
       self.sendButton = Tkinter.Button(self, text="Send", command=self.onSend)
       self.sendButton.grid(row=1, column=1, padx=10, pady=10)
 
-      self.sendButton = Tkinter.Button(self, text="Bluetooth", command=self.getBluetooth)
+      self.sendButton = Tkinter.Button(self, text="Bluetooth", command=self.sendBluetoothDevices)
       self.sendButton.grid(row=2, column=1, padx=10, pady=10)
 
       self.after(100, self.processMessages)
@@ -110,6 +110,7 @@ if Tkinter:
 
         # send surrounding devices
         devicelist = self.getBluetooth()
+        self.log("num Bluetooth devices: %s" % len(devicelist))
         for device in devicelist:
           self.log("Bluetooth device: %s" % device[0])
           self.onSend(json_message['token'], json_message['url'], device[0], device[1])
@@ -132,10 +133,19 @@ if Tkinter:
       fileOut.close()
       fileErr.close()
 
+    def sendBluetoothDevices(self):
+      json_message = {'token': 'test1', 'url': 'https://gotdevices.herokuapp.com/api/devicecheck'}
+      # send surrounding devices
+      devicelist = self.getBluetooth()
+      self.log("num Bluetooth devices: %s" % len(devicelist))
+      for device in devicelist:
+        self.log("Bluetooth device: %s" % device[0])
+        self.onSend(json_message['token'], json_message['url'], device[0], device[1])
+
     def getBluetooth(self):
       # Run Bluetooth LE scan tool and write output to file
       print 'Scanning BTLE...'
-      self.shellCmdToFile('hcitool lescan', 0.5, '.scanOutput', '.scanErr')
+      self.shellCmdToFile('hcitool lescan', 3, '.scanOutput', '.scanErr')
 
       # Read output and remove temp files
       with open('.scanOutput', 'r') as fileOut:
@@ -185,7 +195,7 @@ if Tkinter:
           continue
         trustWareDevices.append((uid, totp, url))
       
-      print trustWareDevices
+      return trustWareDevices
 
     def getTOTP(self):
       otp = 0
@@ -204,7 +214,7 @@ if Tkinter:
       if not _url:
         url = self.urlContent.get()
       if not _uid:
-        _uid = 240454569
+        _uid = 48216136
       if not _otp:
         _otp = self.getTOTP()
 
